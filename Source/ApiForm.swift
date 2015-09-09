@@ -209,7 +209,7 @@ public class ApiForm<ModelType:Object where ModelType:ApiTransformable> {
             path: call.path,
             parameters: call.parameters
         ) { data, error in
-            var response = ApiFormResponse<ModelType>()
+            let response = ApiFormResponse<ModelType>()
             response.rawResponse = data
             
             if let errors = self.errorFromResponse(nil, error: error) {
