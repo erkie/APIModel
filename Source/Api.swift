@@ -36,7 +36,7 @@ public class API {
                 println("ApiModel: \(request.method.rawValue) \(request.path) finished in \(duration) seconds with status \(response.status ?? 0)")
                 
                 if let error = response.error {
-                    println("... Error \(error.localizedDescription)")
+                    print("... Error \(error.localizedDescription)")
                 }
             }
         }

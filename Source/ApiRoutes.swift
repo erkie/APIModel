@@ -8,7 +8,7 @@ public enum ApiRoutesAction {
     case Destroy
 }
 
-@objc
+
 public class ApiRoutes {
     public var index: String
     public var show: String
