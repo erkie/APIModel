@@ -19,7 +19,7 @@ public class ApiRequest {
     }
     
     public var url: String {
-        if let pathHasScheme = NSURL(string: path)?.scheme {
+        if let _ = NSURL(string: path)?.scheme {
             return path
         } else {
             return configuration.host + path

@@ -33,7 +33,7 @@ public class ApiFormResponse<ModelType:Object where ModelType:ApiTransformable> 
     public var rawResponse: ApiResponse?
     
     public var isSuccessful: Bool {
-        for (key, errorsForKey) in errors ?? [:] {
+        for (_, errorsForKey) in errors ?? [:] {
             if !errorsForKey.isEmpty {
                 return false
             }

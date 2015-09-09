@@ -14,7 +14,7 @@ public class API {
             if self.configuration.requestLogging {
                 request.userInfo["requestStartedAt"] = NSDate()
                 
-                println("ApiModel: \(request.method.rawValue) \(request.path) with params: \(request.parameters) \(request.headers)")
+                print("ApiModel: \(request.method.rawValue) \(request.path) with params: \(request.parameters) \(request.headers)")
             }
         }
         
@@ -33,7 +33,7 @@ public class API {
                     duration = "?"
                 }
                 
-                println("ApiModel: \(request.method.rawValue) \(request.path) finished in \(duration) seconds with status \(response.status ?? 0)")
+                print("ApiModel: \(request.method.rawValue) \(request.path) finished in \(duration) seconds with status \(response.status ?? 0)")
                 
                 if let error = response.error {
                     print("... Error \(error.localizedDescription)")
@@ -45,7 +45,7 @@ public class API {
     public func request(method: Alamofire.Method, path: String, parameters: [String: AnyObject] = [:], headers: [String: String] = [:], responseHandler: (ApiResponse?, NSError?) -> Void) {
         let configuration = api().configuration
         
-        var request = ApiRequest(configuration: configuration, method: method, path: path)
+        let request = ApiRequest(configuration: configuration, method: method, path: path)
         request.parameters = parameters
         request.headers = headers
         
