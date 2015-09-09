@@ -11,7 +11,7 @@ func camelizedString(string: String) -> String {
 }
 
 func updateRealmObjectFromDictionaryWithMapping(realmObject: Object, data: [String:AnyObject], mapping: JSONMapping) {
-    for (var key, var value) in data {
+    for (var key, value) in data {
         key = camelizedString(key)
 
         if let transform = mapping[key] {
@@ -34,6 +34,6 @@ extension Object {
     }
 
     public func updateFromDictionaryWithMapping(data: [String:AnyObject], mapping: JSONMapping) {
-        updateRealmObjectFromDictionaryWithMapping(self, data, mapping)
+        updateRealmObjectFromDictionaryWithMapping(self, data: data, mapping: mapping)
     }
 }

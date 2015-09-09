@@ -109,10 +109,10 @@ The base of `ApiModel` is the `ApiForm` wrapper class. This class wraps an `Obje
 ```swift
 // GET call without parameters
 ApiForm<Post>.get("/v1/posts.json") { response in
-    println("response.isSuccessful: \(response.isSuccessful)")
-    println("Response as an array: \(response.array)")
-    println("Response as a dictionary: \(response.dictionary)")
-    println("Response errors?: \(response.errors)")
+    print("response.isSuccessful: \(response.isSuccessful)")
+    print("Response as an array: \(response.array)")
+    print("Response as a dictionary: \(response.dictionary)")
+    print("Response errors?: \(response.errors)")
 }
 
 // Other supported methods:
@@ -139,7 +139,7 @@ Using the `index` of a REST resource:
 ```swift
 ApiForm<Post>.findArray { posts in
     for post in posts {
-        println("... \(post.title)")
+        print("... \(post.title)")
     }
 }
 ```
@@ -150,9 +150,9 @@ Using the `show` of a REST resource:
 ```swift
 ApiForm<User>.find { userResponse in
     if let user = userResponse {
-        println("User is: \(user.email)")
+        print("User is: \(user.email)")
     } else {
-        println("Error loading user")
+        print("Error loading user")
     }
 }
 ```
@@ -168,12 +168,12 @@ post.createdAt = NSDate()
 var form = ApiForm<Post>(model: post)
 form.save { _ in
     if form.hasErrors {
-        println("Could not save:")
+        print("Could not save:")
         for error in form.errorMessages {
-            println("... \(error)")
+            print("... \(error)")
         }
     } else {
-        println("Saved! Post #\(post.id)")
+        print("Saved! Post #\(post.id)")
     }
 }
 ```
@@ -263,9 +263,9 @@ class User: Object, ApiTransformable {
 ApiForm<User>.find { response in
     let user = response!.model
 
-    println("User: \(user.email)")
+    print("User: \(user.email)")
     for post in user.posts {
-        println("\(post.title)")
+        print("\(post.title)")
     }
 }
 ```
@@ -301,9 +301,9 @@ There is also a `afterRequest` which passes in a `ApiRequest` and `ApiResponse`:
 
 ```swift
 api().afterRequest { request, response in
-    println("... Got: \(response.status)")
-    println("... \(request)")
-    println("... \(response)")
+    print("... Got: \(response.status)")
+    print("... \(request)")
+    print("... \(response)")
 }
 ```
 

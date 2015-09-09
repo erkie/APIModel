@@ -15,12 +15,12 @@ public class JSONParser: ApiParser {
             
             var responseJSON: JSON
             if responseString.isEmpty {
-                responseJSON = JSON.nullJSON
+                responseJSON = JSON.null
             } else {
                 if let data = (responseString as NSString).dataUsingEncoding(NSUTF8StringEncoding) {
                     responseJSON = SwiftyJSON.JSON(data: data)
                 } else {
-                    responseJSON = JSON.nullJSON
+                    responseJSON = JSON.null
                 }
             }
             

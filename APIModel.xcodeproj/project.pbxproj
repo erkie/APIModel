@@ -301,7 +301,9 @@
 		03C60D831AAB5B9A00FE99EA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0630;
+				LastSwiftMigration = 0700;
+				LastSwiftUpdateCheck = 0700;
+				LastUpgradeCheck = 0700;
 				TargetAttributes = {
 					033E79161B7C9F78008E2A4D = {
 						CreatedOnToolsVersion = 6.4;
@@ -642,6 +644,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEFINES_MODULE = YES;
+				ENABLE_TESTABILITY = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -675,6 +678,7 @@
 				033E79221B7C9F78008E2A4D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		0366A4961AAF66ED00506F50 /* Build configuration list for PBXNativeTarget "ApiModel" */ = {
 			isa = XCConfigurationList;

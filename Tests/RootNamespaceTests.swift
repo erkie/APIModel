@@ -30,32 +30,32 @@ class RootNamespaceTests: XCTestCase {
     ]
     
     func testPathFormat() {
-        XCTAssertNil(fetchPathFromDictionary("", nestedObject))
-        XCTAssertNil(fetchPathFromDictionary(".....................", nestedObject))
+        XCTAssertNil(fetchPathFromDictionary("", dictionary: nestedObject))
+        XCTAssertNil(fetchPathFromDictionary(".....................", dictionary: nestedObject))
     }
     
     func testThatItCanFetchSingleKeys() {
-        XCTAssert((fetchPathFromDictionary("foo", notNested) as? Int) == 43, "Should be able to fetch single keys")
-        XCTAssertNil(fetchPathFromDictionary("not_exists", notNested), "Should not crash if it doesn't exist")
-        XCTAssertNil(fetchPathFromDictionary("not_exists.foo.bam", notNested), "Should not crash if it doesn't exist nested")
+        XCTAssert((fetchPathFromDictionary("foo", dictionary: notNested) as? Int) == 43, "Should be able to fetch single keys")
+        XCTAssertNil(fetchPathFromDictionary("not_exists", dictionary: notNested), "Should not crash if it doesn't exist")
+        XCTAssertNil(fetchPathFromDictionary("not_exists.foo.bam", dictionary: notNested), "Should not crash if it doesn't exist nested")
     }
     
     func testThatItCanFetchNestingKeys() {
-        XCTAssert((fetchPathFromDictionary("foo.bar.baz.bam", nestedObject) as? Int) == 42, "Should be able to fetch single keys")
-        XCTAssertNil(fetchPathFromDictionary("foo.bar.BAM", nestedObject), "Should be able to handle non-existing keys")
+        XCTAssert((fetchPathFromDictionary("foo.bar.baz.bam", dictionary: nestedObject) as? Int) == 42, "Should be able to fetch single keys")
+        XCTAssertNil(fetchPathFromDictionary("foo.bar.BAM", dictionary: nestedObject), "Should be able to handle non-existing keys")
     }
     
     func testThatItHandlesWrongTypes() {
-        XCTAssertNil(fetchPathFromDictionary("foo.bar.bam", nestedButNotDictionary), "Should handle bad keys")
+        XCTAssertNil(fetchPathFromDictionary("foo.bar.bam", dictionary: nestedButNotDictionary), "Should handle bad keys")
     }
     
     func testThatItCanFetchSingleNesting() {
-        if let nested = fetchPathFromDictionary("foo", singleNesting) as? [String:Int] {
+        if let nested = fetchPathFromDictionary("foo", dictionary: singleNesting) as? [String:Int] {
             XCTAssert(nested == ["bar": 44], "Can fetch nested objects")
         } else {
             XCTAssert(false, "Can fetch nested objects")
         }
         
-        XCTAssert((fetchPathFromDictionary("foo.bar", singleNesting) as? Int) == 44, "Can fetch singly nested objects")
+        XCTAssert((fetchPathFromDictionary("foo.bar", dictionary: singleNesting) as? Int) == 44, "Can fetch singly nested objects")
     }
 }

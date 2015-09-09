@@ -1,21 +1,50 @@
 PODS:
-  - Alamofire (1.3.0)
-  - Realm (0.94.0):
-    - Realm/Headers (= 0.94.0)
-  - Realm/Headers (0.94.0)
-  - RealmSwift (0.94.0):
-    - Realm (= 0.94.0)
+  - Alamofire (2.0.0-beta.4)
+  - Realm (0.95.0):
+    - Realm/Headers (= 0.95.0)
+  - Realm/Headers (0.95.0)
+  - RealmSwift (0.95.0):
+    - Realm (= 0.95.0)
   - SwiftyJSON (2.2.1)
 
 DEPENDENCIES:
-  - Alamofire (~> 1.3)
-  - RealmSwift (~> 0.94.0)
-  - SwiftyJSON (~> 2.2.1)
+  - Alamofire (from `https://github.com/Alamofire/Alamofire.git`, branch `swift-2.0`)
+  - Realm (from `https://github.com/realm/realm-cocoa.git`, branch `swift-2.0`)
+  - RealmSwift (from `https://github.com/realm/realm-cocoa.git`, branch `swift-2.0`)
+  - SwiftyJSON (from `https://github.com/SwiftyJSON/SwiftyJSON.git`, branch `xcode7`)
+
+EXTERNAL SOURCES:
+  Alamofire:
+    :branch: swift-2.0
+    :git: https://github.com/Alamofire/Alamofire.git
+  Realm:
+    :branch: swift-2.0
+    :git: https://github.com/realm/realm-cocoa.git
+  RealmSwift:
+    :branch: swift-2.0
+    :git: https://github.com/realm/realm-cocoa.git
+  SwiftyJSON:
+    :branch: xcode7
+    :git: https://github.com/SwiftyJSON/SwiftyJSON.git
+
+CHECKOUT OPTIONS:
+  Alamofire:
+    :commit: 092022fb5b1580e28ce1f1344484e04820c168e0
+    :git: https://github.com/Alamofire/Alamofire.git
+  Realm:
+    :commit: e51348f34142e821bef704a71b21b6002464871f
+    :git: https://github.com/realm/realm-cocoa.git
+  RealmSwift:
+    :commit: e51348f34142e821bef704a71b21b6002464871f
+    :git: https://github.com/realm/realm-cocoa.git
+  SwiftyJSON:
+    :commit: d4df13c66146a8e9c8d96c852746a08363003d36
+    :git: https://github.com/SwiftyJSON/SwiftyJSON.git
 
 SPEC CHECKSUMS:
-  Alamofire: 220403a8d5840e0b4c946a6fbaf209dbca124282
-  Realm: a046149653e0ca220b65b5783da907aa5b74d86c
-  RealmSwift: 5efbbf1a5c179a7237e4d428594e41619fa167ba
+  Alamofire: 20df1a4740a69d7cf6caf7fd06b8a8fc782f1ebd
+  Realm: 1c28007bd496af94dba8c76d50719164e706a521
+  RealmSwift: 9864524dd99c2cb7b4643c29513ef8447fe63724
   SwiftyJSON: ae2d0a3d68025d136602a33c4ee215091ced3e33
 
 COCOAPODS: 0.38.2
