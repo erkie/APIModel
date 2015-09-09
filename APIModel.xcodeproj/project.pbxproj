@@ -303,7 +303,7 @@
 			attributes = {
 				LastSwiftMigration = 0700;
 				LastSwiftUpdateCheck = 0700;
-				LastUpgradeCheck = 0630;
+				LastUpgradeCheck = 0700;
 				TargetAttributes = {
 					033E79161B7C9F78008E2A4D = {
 						CreatedOnToolsVersion = 6.4;
@@ -313,7 +313,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 03C60D861AAB5B9A00FE99EA /* Build configuration list for PBXProject "APIModel" */;
+			buildConfigurationList = 03C60D861AAB5B9A00FE99EA /* Build configuration list for PBXProject "ApiModel" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -644,6 +644,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEFINES_MODULE = YES;
+				ENABLE_TESTABILITY = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -688,7 +689,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		03C60D861AAB5B9A00FE99EA /* Build configuration list for PBXProject "APIModel" */ = {
+		03C60D861AAB5B9A00FE99EA /* Build configuration list for PBXProject "ApiModel" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				03C60D871AAB5B9A00FE99EA /* Debug */,
