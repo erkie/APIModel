@@ -4,6 +4,7 @@ source 'https://github.com/CocoaPods/Specs.git'
 
 use_frameworks!
 
-pod 'Alamofire', '~> 1.3'
-pod 'RealmSwift', '~> 0.94.0'
-pod 'SwiftyJSON', '~> 2.2.1'
+pod 'Alamofire', git: 'https://github.com/Alamofire/Alamofire.git', branch: 'swift-2.0'
+pod 'Realm', :git => 'https://github.com/realm/realm-cocoa.git', :branch => 'swift-2.0'
+pod 'RealmSwift', :git => 'https://github.com/realm/realm-cocoa.git', :branch => 'swift-2.0'
+pod 'SwiftyJSON', git: 'https://github.com/SwiftyJSON/SwiftyJSON.git', branch: 'xcode7'
