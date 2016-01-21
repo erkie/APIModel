@@ -36,7 +36,7 @@ public class ApiManager {
                 print("ApiModel: \(request.method.rawValue) \(request.path) finished in \(duration) seconds with status \(response.status ?? 0)")
                 
                 if let error = response.error {
-                    print("... Error \(error.description())")
+                    print("... Error \(error.description)")
                 }
             }
         }
@@ -48,7 +48,7 @@ public class ApiManager {
         parameters: [String: AnyObject] = [:],
         headers: [String: String] = [:],
         apiConfig: ApiConfig,
-        responseHandler: (ApiResponse?, ApiResponseError?) -> Void
+        responseHandler: (ApiResponse?, NSError?) -> Void
     ) {
         let parser = apiConfig.parser
         
@@ -66,14 +66,16 @@ public class ApiManager {
         }
         
         performRequest(request) { response in
+            
             parser.parse(response.responseBody ?? "") { parsedResponse in
-                let (finalResponse, errors) = self.handleResponse(
+                
+                let (finalResponse, error) = self.handleResponse(
                     response,
                     parsedResponse: parsedResponse,
                     apiConfig: apiConfig
                 )
                 
-                responseHandler(finalResponse, errors)
+                responseHandler(finalResponse, error)
             }
         }
     }
@@ -82,17 +84,10 @@ public class ApiManager {
         response: ApiResponse,
         parsedResponse: AnyObject?,
         apiConfig: ApiConfig
-    ) -> (ApiResponse?, ApiResponseError?) {
-        // if response is either nil or NSNull and the request was not 200 it is an error
-        if (parsedResponse == nil || (parsedResponse as? NSNull) != nil) && !response.isSuccessful {
-            response.error = ApiResponseError.BadRequest(code: response.status ?? 0)
-        }
-        
-        if response.isInvalid {
-            response.error = ApiResponseError.InvalidRequest(code: response.status ?? 0)
-        }
+    ) -> (ApiResponse?, NSError?) {
         
         response.parsedResponse = parsedResponse
+        
         if let nestedResponse = parsedResponse as? [String:AnyObject] where !apiConfig.rootNamespace.isEmpty {
             response.parsedResponse = fetchPathFromDictionary(apiConfig.rootNamespace, dictionary: nestedResponse)
         } else {
@@ -112,18 +107,25 @@ public class ApiManager {
             encoding: request.encoding,
             headers: request.headers
         )
-        .responseString { alamofireResponse in
-            response.responseBody = alamofireResponse.result.value
-            if let error = alamofireResponse.result.error {
-                response.error = ApiResponseError.ServerError(error)
+        .response{ almoRequest, almoResponse, data, error in
+            if let almoResponse = almoResponse{
+                response.status = almoResponse.statusCode
             }
-            response.status = alamofireResponse.response?.statusCode
+            
+            if let data = data {
+                response.responseBody = NSString(data: data, encoding: NSUTF8StringEncoding) as String!
+            }
+            
+            if let error = error{
+                response.error = error
+            }
             
             for hook in self.afterRequestHooks {
                 hook(request, response)
             }
             
             responseHandler(response)
+            
         }
     }
     
