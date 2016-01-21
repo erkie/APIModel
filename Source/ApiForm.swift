@@ -79,10 +79,10 @@ public class ApiModelResponse<ModelType:Object where ModelType:ApiModel> : ApiMo
     public var serverErrors: AnyObject?
     public var validationErrors: [[String : String]]?
     
-    private var responseObject: [String:AnyObject]?
-    private var responseArray: [AnyObject]?
-    private var object: ModelType?
-    private var array: [ModelType]?
+    public var responseObject: [String:AnyObject]?
+    public var responseArray: [AnyObject]?
+    public var object: ModelType?
+    public var array: [ModelType]?
 }
 
 public class Api<ModelType:Object where ModelType:ApiModel> {
