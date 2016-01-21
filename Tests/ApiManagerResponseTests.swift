@@ -51,8 +51,7 @@ class ApiManagerResponseTests: XCTestCase {
         Api<Post>.get("/v1/posts.json") { response in
             
             XCTAssertEqual(response.rawResponse!.status!, 404, "A response should have a status of 404")
-            XCTAssertEqual(String(response.rawResponse!.error!),"InvalidRequest(404)")
-            XCTAssertTrue(response.rawResponse!.isInvalid, "A response status of 404 should be invalid")
+            XCTAssertTrue(response.rawResponse!.isClientError, "A response status of 404 should be invalid")
             
             theResponse = response
             
@@ -80,8 +79,7 @@ class ApiManagerResponseTests: XCTestCase {
         Api<Post>.get("/v1/posts.json") { response in
             
             XCTAssertEqual(response.rawResponse!.status!, 500, "A response should have a status of 500")
-            XCTAssertEqual(String(response.rawResponse!.error!),"BadRequest(500)")
-            XCTAssertTrue(response.rawResponse!.isInvalid, "A response status of 500 should be invalid")
+            XCTAssertTrue(response.rawResponse!.isInternalServerError, "A response status of 500 should be invalid")
             
             theResponse = response
             

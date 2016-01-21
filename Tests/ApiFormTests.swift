@@ -49,12 +49,15 @@ class ApiFormTests: XCTestCase {
             return fixture(stubPath!, headers: ["Content-Type":"application/json"])
         }
         
-        Api<Post>.findArray { response in
+        Api<Post>.findArray { response, apiModelResponse in
             theResponse = response
             
-            XCTAssertEqual(response.count, 2)
-            XCTAssertEqual(response.first!.id, "1")
-            XCTAssertEqual(response.last!.id, "2")
+            if let response = response {
+                XCTAssertEqual(response.count, 2)
+                XCTAssertEqual(response.first!.id, "1")
+                XCTAssertEqual(response.last!.id, "2")
+            }
+            
             
             readyExpectation.fulfill()
             OHHTTPStubs.removeAllStubs()
@@ -75,28 +78,35 @@ class ApiFormTests: XCTestCase {
         
         
         stub({_ in true}) { request in
-            return OHHTTPStubsResponse(data:"Something went wrong!".dataUsingEncoding(NSUTF8StringEncoding)!, statusCode: 500, headers: nil)
+            let stubPath = OHPathForFile("500_error.json", self.dynamicType)
+            return fixture(stubPath!, status: 500, headers: ["Content-Type":"application/json"])
         }
         
         Api<Post>.get("/v1/posts.json") { response in
             theResponse = response
             
-            XCTAssertEqual(response.errors!, ["base" : ["An unexpected server error occurred"]])
+            XCTAssertNotNil(response.serverErrors, "Response errors should not be nil")
             
-            readyExpectation.fulfill()
-            OHHTTPStubs.removeAllStubs()
+            if let errors = response.serverErrors as? [[String: String]]{
+                let expected: [[String: String]] = [["status":"500","code":"ServerError","detail":"A fatal error has occured."]]
+                
+                XCTAssertEqual(errors, expected)
+                
+                readyExpectation.fulfill()
+                OHHTTPStubs.removeAllStubs()
+            }
         }
 
         self.waitForExpectationsWithTimeout(self.timeout) { err in
             // By the time we reach this code, the while loop has exited
             // so the response has arrived or the test has timed out
             XCTAssertNotNil(theResponse, "Received data should not be nil")
+            OHHTTPStubs.removeAllStubs()
         }
     }
     
     func testFindArrayWithServerFailure() {
         
-        var theResponse: [Post]?
         let readyExpectation = self.expectationWithDescription("ready")
         
         
@@ -104,12 +114,28 @@ class ApiFormTests: XCTestCase {
             return OHHTTPStubsResponse(data:"Something went wrong!".dataUsingEncoding(NSUTF8StringEncoding)!, statusCode: 500, headers: nil)
         }
         
-        Api<Post>.findArray { response in
-            theResponse = response
+        Api<Post>.findArray { array, apiModelResponse in
+            XCTAssertNil(array)
             
-            XCTAssertNotNil(response)
+            if let response = array {
+                XCTAssertEqual(response.count, 0)
+            }
             
-            XCTAssertEqual(response.count, 0)
+            XCTAssertNotNil(apiModelResponse)
+            
+            if let apiModelResponse = apiModelResponse {
+                XCTAssertTrue(apiModelResponse.hasErrors)
+                XCTAssertTrue(apiModelResponse.hasInternalServerError)
+                XCTAssertFalse(apiModelResponse.hasValidationErrors)
+                
+                // But what happened? - the server returned meaningful validations but are lost!
+                XCTAssertNotNil(apiModelResponse.serverErrorMessages)
+                
+                if let errorMessages = apiModelResponse.serverErrorMessages {
+                    XCTAssertEqual(errorMessages, ["Base: An unexpected server error occured"])
+                }
+
+            }
             
             readyExpectation.fulfill()
             OHHTTPStubs.removeAllStubs()
@@ -118,7 +144,7 @@ class ApiFormTests: XCTestCase {
         self.waitForExpectationsWithTimeout(self.timeout) { err in
             // By the time we reach this code, the while loop has exited
             // so the response has arrived or the test has timed out
-            XCTAssertNotNil(theResponse, "Received data should not be nil")
+            XCTAssertNil(err, "Timeout occured")
         }
     }
     
@@ -127,10 +153,11 @@ class ApiFormTests: XCTestCase {
         let readyExpectation = self.expectationWithDescription("ready")
         
         stub({_ in true}) { request in
-            return OHHTTPStubsResponse(data:"Something went wrong!".dataUsingEncoding(NSUTF8StringEncoding)!, statusCode: 500, headers: nil)
+            let stubPath = OHPathForFile("500_error.json", self.dynamicType)
+            return fixture(stubPath!, status: 500, headers: ["Content-Type":"application/json"])
         }
         
-        Api<Post>.find { response in
+        Api<Post>.find { response, apiModelResponse in
 
             XCTAssertNil(response)
             
@@ -156,14 +183,94 @@ class ApiFormTests: XCTestCase {
         
         let post = Post()
 
-        var form = Api<Post>(model: post)
+        let form = Api<Post>(model: post)
         
-        form.save { _ in
-            XCTAssertTrue(form.hasErrors)
+        form.save { apiModelResponse in
+            XCTAssertTrue(apiModelResponse.hasErrors)
+            XCTAssertFalse(apiModelResponse.hasInternalServerError)
+            XCTAssertTrue(apiModelResponse.hasValidationErrors)
+            
+            XCTAssertNotNil(apiModelResponse.validationErrors)
             
             // But what happened? - the server returned meaningful validations but are lost!
-            XCTAssertEqual(form.errorMessages, ["An unexpected server error occurred"])
+            if let validationErrors = apiModelResponse.validationErrorMessages {
+                XCTAssertEqual(validationErrors, ["Title: must not be blank!", "Contents: must not be blank!"])
+            }
+            
 
+            readyExpectation.fulfill()
+            
+            OHHTTPStubs.removeAllStubs()
+        }
+        
+        self.waitForExpectationsWithTimeout(self.timeout) { err in
+            // By the time we reach this code, the while loop has exited
+            // so the response has arrived or the test has timed out
+            XCTAssertNil(err, "Received data should be nil")
+        }
+    }
+    
+    func testSaveWithServerErrors() {
+        
+        let readyExpectation = self.expectationWithDescription("ready")
+        
+        stub({_ in true}) { request in
+            let stubPath = OHPathForFile("500_error.json", self.dynamicType)
+            return fixture(stubPath!, status: 500, headers: ["Content-Type":"application/json"])
+        }
+        
+        let post = Post()
+        
+        let form = Api<Post>(model: post)
+        
+        form.save { apiModelResponse in
+            XCTAssertTrue(apiModelResponse.hasErrors)
+            XCTAssertTrue(apiModelResponse.hasInternalServerError)
+            XCTAssertFalse(apiModelResponse.hasValidationErrors)
+            
+            XCTAssertNotNil(apiModelResponse.serverErrorMessages)
+            
+            if let errorMessages = apiModelResponse.serverErrorMessages {
+                XCTAssertEqual(errorMessages, ["Status: 500","Detail: A fatal error has occured.","Code: ServerError"])
+            }
+
+            
+            readyExpectation.fulfill()
+            
+            OHHTTPStubs.removeAllStubs()
+        }
+        
+        self.waitForExpectationsWithTimeout(self.timeout) { err in
+            // By the time we reach this code, the while loop has exited
+            // so the response has arrived or the test has timed out
+            XCTAssertNil(err, "Received data should be nil")
+        }
+    }
+    
+    func testSaveWithHTMLServerErrors() {
+        
+        let readyExpectation = self.expectationWithDescription("ready")
+        
+        stub({_ in true}) { request in
+            return OHHTTPStubsResponse(data:"<body>Something went wrong!</body>".dataUsingEncoding(NSUTF8StringEncoding)!, statusCode: 500, headers: nil)
+        }
+        
+        let post = Post()
+        
+        let form = Api<Post>(model: post)
+        
+        form.save { apiModelResponse in
+            XCTAssertTrue(apiModelResponse.hasErrors)
+            XCTAssertTrue(apiModelResponse.hasInternalServerError)
+            XCTAssertFalse(apiModelResponse.hasValidationErrors)
+            
+            // But what happened? - the server returned meaningful validations but are lost!
+            XCTAssertNotNil(apiModelResponse.serverErrorMessages)
+            
+            if let errorMessages = apiModelResponse.serverErrorMessages {
+                XCTAssertEqual(errorMessages, ["Base: An unexpected server error occured"])
+            }
+            
             readyExpectation.fulfill()
             
             OHHTTPStubs.removeAllStubs()

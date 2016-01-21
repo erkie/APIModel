@@ -1,5 +1,5 @@
 {
     "post": {
-        "errors": [{"title": "Must not be blank!"}]
+        "errors": [{"title": "must not be blank!"}, {"contents": "must not be blank!"}]
     }
 }

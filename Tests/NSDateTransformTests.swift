@@ -55,13 +55,18 @@ class NSDateTransformTests: XCTestCase {
     }
     
     func testUserDefinedDateFormat() {
+        let now = NSDate()
+        
         let transform = NSDateTransform(dateFormat: "yyyy-MM-dd")
-        let res = transform.perform("2015-12-30") as? NSDate
+        let res = transform.perform(now) as? NSDate
+    
+        let calendar = NSCalendar.currentCalendar()
+        let components = calendar.components([.Day , .Month , .Year], fromDate: now)
         
         let referenceDateCreator = NSDateComponents()
-        referenceDateCreator.year = 2015
-        referenceDateCreator.month = 12
-        referenceDateCreator.day = 30
+        referenceDateCreator.year = components.year
+        referenceDateCreator.month = components.month
+        referenceDateCreator.day = components.day
         
         let referenceDate = calendar.dateFromComponents(referenceDateCreator)
         
