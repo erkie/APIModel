@@ -1,80 +1,96 @@
 import RealmSwift
 import Alamofire
 
-public enum ApiModelStatus {
-    case None
-    case Successful(Int)
-    case Unauthorized(Int)
-    case Invalid(Int)
-    case ServerError(Int)
+public protocol ApiModelResponseable {
     
-    init(statusCode: Int) {
-        if statusCode >= 200 && statusCode <= 299 {
-            self = .Successful(statusCode)
-        } else if statusCode == 401 {
-            self = .Unauthorized(statusCode)
-        } else if statusCode >= 400 && statusCode <= 499 {
-            self = .Invalid(statusCode)
-        } else if statusCode >= 500 && statusCode <= 599 {
-            self = .ServerError(statusCode)
-        } else {
-            self = .None
+    var responseData: [String:AnyObject]? { get set }
+    var rawResponse: ApiResponse?  { get set }
+    
+    var serverErrors: AnyObject?  { get set }
+    var validationErrors: [[String : String]]?  { get set }
+}
+
+public extension ApiModelResponseable {
+    
+    private func errorArraytoStrings(array: [[String: String]]?) -> [String]? {
+        if let array = array {
+            var messages = [String]()
+            
+            for fieldErrors in array {
+                
+                for (field, descrpt) in fieldErrors {
+                    messages.append("\(field.capitalizedString): \(descrpt)")
+                }
+            }
+            
+            return messages
         }
+        
+        return nil
+    }
+    
+    public var isSuccessful: Bool {
+        if let rawResponse = self.rawResponse {
+            return rawResponse.isSuccessful
+        }
+        
+        return false
+    }
+    
+    public var serverErrorMessages: [String]? {
+        
+        if let serverErrors = serverErrors as? [[String: String]] {
+            return errorArraytoStrings(serverErrors)
+        }
+        
+        return nil
+    }
+    
+    public var hasInternalServerError: Bool {
+        if let rawResponse = self.rawResponse where rawResponse.isInternalServerError {
+            return true
+        }
+        
+        return false
+    }
+    
+    public var hasValidationErrors: Bool {
+        if let rawResponse = self.rawResponse where rawResponse.isUnprocessableEntity {
+            return true
+        }
+        
+        return false
+    }
+    
+    public var hasErrors: Bool {
+        return hasValidationErrors || hasInternalServerError
+    }
+    
+    
+    public var validationErrorMessages: [String]? {
+        return errorArraytoStrings(validationErrors)
     }
 }
 
-public class ApiModelResponse<ModelType:Object where ModelType:ApiModel> {
+
+public class ApiModelResponse<ModelType:Object where ModelType:ApiModel> : ApiModelResponseable {
     public var responseData: [String:AnyObject]?
+    public var rawResponse: ApiResponse?
+    public var serverErrors: AnyObject?
+    public var validationErrors: [[String : String]]?
+    
     public var responseObject: [String:AnyObject]?
     public var responseArray: [AnyObject]?
     public var object: ModelType?
     public var array: [ModelType]?
-    public var errors: [String:[String]]?
-    public var rawResponse: ApiResponse?
-    
-    public var isSuccessful: Bool {
-        for (_, errorsForKey) in errors ?? [:] {
-            if !errorsForKey.isEmpty {
-                return false
-            }
-        }
-        return true
-    }
-    
-    public var responseStatus: ApiModelStatus {
-        if let status = rawResponse?.status {
-            return ApiModelStatus(statusCode: status)
-        } else {
-            return .None
-        }
-    }
 }
 
 public class Api<ModelType:Object where ModelType:ApiModel> {
     public typealias ResponseCallback = (ApiModelResponse<ModelType>) -> Void
     
     public var apiConfig: ApiConfig
-    public var status: ApiModelStatus = .None
-    public var errors: [String:[String]] = [:]
     public var model: ModelType
-    
-    public var errorMessages:[String] {
-        var errorString: [String] = []
-        for (key, errorsForProperty) in errors {
-            for message in errorsForProperty {
-                if key == "base" {
-                    errorString.append(message)
-                } else {
-                    errorString.append("\(key.capitalizedString) \(message)")
-                }
-            }
-        }
-        return errorString
-    }
-    
-    public var hasErrors: Bool {
-        return !errors.isEmpty
-    }
+    private var apiModelResponse: ApiModelResponse<ModelType>?
     
     public required init(model: ModelType, apiConfig: ApiConfig) {
         self.model = model
@@ -100,18 +116,12 @@ public class Api<ModelType:Object where ModelType:ApiModel> {
     }
     
     public func updateFromResponse(response: ApiModelResponse<ModelType>) {
-        if let statusCode = response.rawResponse?.status {
-            self.status = ApiModelStatus(statusCode: statusCode)
-        }
-        
         if let responseObject = response.responseObject {
             model.modifyStoredObject {
                 self.model.updateFromDictionary(responseObject)
             }
-        }
-        
-        if let errors = response.errors {
-            self.errors = errors
+            
+            self.apiModelResponse = response
         }
     }
     
@@ -210,14 +220,14 @@ public class Api<ModelType:Object where ModelType:ApiModel> {
         }
     }
     
-    public func save(callback: (Api) -> Void) {
+    public func save(callback: ResponseCallback) {
         let parameters: [String: AnyObject] = [
             ModelType.apiNamespace(): model.JSONDictionary()
         ]
         
         let responseCallback: ResponseCallback = { response in
             self.updateFromResponse(response)
-            callback(self)
+            callback(response)
         }
         
         if model.isApiSaved() {
@@ -239,30 +249,37 @@ public class Api<ModelType:Object where ModelType:ApiModel> {
     }
     
     public class func perform(call: ApiCall, apiConfig: ApiConfig, callback: ResponseCallback?) {
+        
         apiManager().request(
             call.method,
             path: call.path,
             parameters: call.parameters,
             apiConfig: apiConfig
-        ) { data, error in
+        ){ apiResponse, error in
+            
             let response = ApiModelResponse<ModelType>()
-            response.rawResponse = data
             
-            if let errors = self.errorFromResponse(nil, error: error) {
-                response.errors = errors
-            }
-            
-            if let data: AnyObject = data?.parsedResponse {
-                response.responseData = data as? [String:AnyObject]
+            response.rawResponse = apiResponse
+
+            if let apiResponse = apiResponse, parsedResponse: AnyObject = apiResponse.parsedResponse {
+                response.responseData = parsedResponse as? [String:AnyObject]
                 
-                if let responseObject = self.objectFromResponseForNamespace(data, namespace: call.namespace) {
+                if let responseData = response.responseData, errors = responseData["errors"] {
+                    response.serverErrors = errors
+                } else if apiResponse.isInternalServerError{
+                    response.serverErrors = [["base": "An unexpected server error occured"]]
+                }
+                
+                if let responseObject = self.objectFromResponseForNamespace(parsedResponse, namespace: call.namespace) {
                     response.responseObject = responseObject
                     response.object = self.fromApi(responseObject)
                     
-                    if let errors = self.errorFromResponse(responseObject, error: error) {
-                        response.errors = errors
+                    
+                    if let validationErrors = responseObject["errors"] as? [[String : String]] {
+                        response.validationErrors = validationErrors
                     }
-                } else if let arrayData = self.arrayFromResponseForNamespace(data, namespace: call.namespace) {
+                    
+                } else if let arrayData = self.arrayFromResponseForNamespace(parsedResponse, namespace: call.namespace) {
                     response.responseArray = arrayData
                     response.array = []
                     
@@ -273,7 +290,7 @@ public class Api<ModelType:Object where ModelType:ApiModel> {
                     }
                 }
             }
-            
+
             callback?(response)
         }
     }
@@ -284,17 +301,5 @@ public class Api<ModelType:Object where ModelType:ApiModel> {
     
     private class func arrayFromResponseForNamespace(data: AnyObject, namespace: String) -> [AnyObject]? {
         return (data[namespace] as? [AnyObject]) ?? (data[namespace.pluralize()] as? [AnyObject])
-    }
-    
-    private class func errorFromResponse(response: [String:AnyObject]?, error: ApiResponseError?) -> [String:[String]]? {
-        if let errors = response?["errors"] as? [String:[String]] {
-            return errors
-        } else if let errors = response?["errors"] as? [String] {
-            return ["base": errors]
-        } else if error != nil {
-            return ["base": ["An unexpected server error occurred"]]
-        } else {
-            return nil
-        }
     }
 }
