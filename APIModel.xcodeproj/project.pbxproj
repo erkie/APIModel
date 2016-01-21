@@ -46,6 +46,7 @@
 		2052AD531C485C6800C54C6A /* posts.json in Resources */ = {isa = PBXBuildFile; fileRef = 2052AD521C485C6800C54C6A /* posts.json */; };
 		207552BC1C484AD4009D519A /* Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207552BB1C484AD4009D519A /* Post.swift */; };
 		20A279241C4EA51200120C5F /* post_with_error.json in Resources */ = {isa = PBXBuildFile; fileRef = 20A279231C4EA51200120C5F /* post_with_error.json */; };
+		20B195E11C4FE7AD0017E7D2 /* 500_error.json in Resources */ = {isa = PBXBuildFile; fileRef = 20B195E01C4FE7AD0017E7D2 /* 500_error.json */; };
 		6377EB3DDC97316FEB89B483 /* Pods_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 111CBA07581C3F21B9A60B05 /* Pods_Tests.framework */; };
 		6D47F25F1AF786C8007DEF9A /* DoubleTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D47F25E1AF786C8007DEF9A /* DoubleTransform.swift */; };
 		6DE1A3261AFB6035002CB25E /* Object+ApiModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE1A3251AFB6035002CB25E /* Object+ApiModel.swift */; };
@@ -105,6 +106,7 @@
 		2052AD521C485C6800C54C6A /* posts.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = posts.json; sourceTree = "<group>"; };
 		207552BB1C484AD4009D519A /* Post.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Post.swift; sourceTree = "<group>"; };
 		20A279231C4EA51200120C5F /* post_with_error.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = post_with_error.json; sourceTree = "<group>"; };
+		20B195E01C4FE7AD0017E7D2 /* 500_error.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 500_error.json; sourceTree = "<group>"; };
 		2D5BA2758CD4A8B5313DB805 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		401654F7FCB7720D7CB61B36 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		6D47F25E1AF786C8007DEF9A /* DoubleTransform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DoubleTransform.swift; sourceTree = "<group>"; };
@@ -210,6 +212,7 @@
 				033E791A1B7C9F78008E2A4D /* Info.plist */,
 				2052AD521C485C6800C54C6A /* posts.json */,
 				20A279231C4EA51200120C5F /* post_with_error.json */,
+				20B195E01C4FE7AD0017E7D2 /* 500_error.json */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -408,6 +411,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				20A279241C4EA51200120C5F /* post_with_error.json in Resources */,
+				20B195E11C4FE7AD0017E7D2 /* 500_error.json in Resources */,
 				2052AD531C485C6800C54C6A /* posts.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
