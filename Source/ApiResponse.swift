@@ -10,12 +10,28 @@ public class ApiResponse {
     public var isSuccessful: Bool {
         if let status = status {
             return status >= 200 && status <= 299
-        } else {
-            return false
         }
+        
+        return false
     }
     
-    public var isInvalid: Bool {
+    public var isInternalServerError: Bool {
+        if let status = status {
+            return status >= 500 && status <= 599
+        }
+        
+        return false
+    }
+    
+    public var isUnprocessableEntity: Bool {
+        if let status = status {
+            return status == 422
+        }
+        
+        return false
+    }
+    
+    public var isClientError: Bool {
         if let status = status {
             return status >= 400 && status <= 499
         } else {
