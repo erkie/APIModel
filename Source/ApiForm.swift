@@ -29,7 +29,7 @@ public extension ApiModelResponseable {
         return nil
     }
     
-    public var isSuccessful: Bool {
+    var isSuccessful: Bool {
         if let rawResponse = self.rawResponse {
             return rawResponse.isSuccessful
         }
@@ -37,7 +37,7 @@ public extension ApiModelResponseable {
         return false
     }
     
-    public var serverErrorMessages: [String]? {
+    var serverErrorMessages: [String]? {
         
         if let serverErrors = serverErrors as? [[String: String]] {
             return errorArraytoStrings(serverErrors)
@@ -46,7 +46,7 @@ public extension ApiModelResponseable {
         return nil
     }
     
-    public var hasInternalServerError: Bool {
+    var hasInternalServerError: Bool {
         if let rawResponse = self.rawResponse where rawResponse.isInternalServerError {
             return true
         }
@@ -54,7 +54,7 @@ public extension ApiModelResponseable {
         return false
     }
     
-    public var hasValidationErrors: Bool {
+    var hasValidationErrors: Bool {
         if let rawResponse = self.rawResponse where rawResponse.isUnprocessableEntity {
             return true
         }
@@ -62,12 +62,12 @@ public extension ApiModelResponseable {
         return false
     }
     
-    public var hasErrors: Bool {
+    var hasErrors: Bool {
         return hasValidationErrors || hasInternalServerError
     }
     
     
-    public var validationErrorMessages: [String]? {
+    var validationErrorMessages: [String]? {
         return errorArraytoStrings(validationErrors)
     }
 }
@@ -79,17 +79,19 @@ public class ApiModelResponse<ModelType:Object where ModelType:ApiModel> : ApiMo
     public var serverErrors: AnyObject?
     public var validationErrors: [[String : String]]?
     
-    public var responseObject: [String:AnyObject]?
-    public var responseArray: [AnyObject]?
-    public var object: ModelType?
-    public var array: [ModelType]?
+    private var responseObject: [String:AnyObject]?
+    private var responseArray: [AnyObject]?
+    private var object: ModelType?
+    private var array: [ModelType]?
 }
 
 public class Api<ModelType:Object where ModelType:ApiModel> {
     public typealias ResponseCallback = (ApiModelResponse<ModelType>) -> Void
+    public typealias ArrayResponseCallback = ([ModelType]?, ApiModelResponse<ModelType>?) -> Void
+    public typealias ObjectResponseCallback = (ModelType?, ApiModelResponse<ModelType>?) -> Void
     
     public var apiConfig: ApiConfig
-    public var model: ModelType
+    private var model: ModelType
     private var apiModelResponse: ApiModelResponse<ModelType>?
     
     public required init(model: ModelType, apiConfig: ApiConfig) {
@@ -192,19 +194,19 @@ public class Api<ModelType:Object where ModelType:ApiModel> {
     
     // active record (rails) style methods
     
-    public class func find(callback: (ModelType?) -> Void) {
+    public class func find(callback: ObjectResponseCallback) {
         get(ModelType.apiRoutes().index) { response in
-            callback(response.object)
+            callback(response.object, response)
         }
     }
     
-    public class func findArray(callback: ([ModelType]) -> Void) {
+    public class func findArray(callback: ArrayResponseCallback) {
         findArray(ModelType.apiRoutes().index, callback: callback)
     }
     
-    public class func findArray(path: String, callback: ([ModelType]) -> Void) {
+    public class func findArray(path: String, callback: ArrayResponseCallback) {
         get(path) { response in
-            callback(response.array ?? [])
+            callback(response.array, response)
         }
     }
     
