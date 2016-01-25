@@ -282,4 +282,51 @@ class ApiFormTests: XCTestCase {
             XCTAssertNil(err, "Received data should be nil")
         }
     }
+    
+    func testStoreObjectWithErrorsFromApiThatAlreadyExists() {
+        let author = Author()
+        author.id = "1"
+        author.name = "Babaji"
+        
+        let post = Post()
+        post.id = "1"
+        post.title = "My Title"
+        post.contents = "My Contents"
+        post.createdAt = NSDate()
+        post.author = author
+        
+        try! testRealm.write {
+            self.testRealm.add(post)
+        }
+        
+        let readyExpectation = self.expectationWithDescription("ready")
+        
+        stub({_ in true}) { request in
+            let stubPath = OHPathForFile("post_with_attributes_and_error.json", self.dynamicType)
+            return fixture(stubPath!, status: 422, headers: ["Content-Type":"application/json"])
+        }
+        
+        let form = Api<Post>(model: post)
+        
+        form.save { apiModelResponse in
+            XCTAssertTrue(apiModelResponse.hasErrors)
+            XCTAssertFalse(apiModelResponse.hasInternalServerError)
+            XCTAssertTrue(apiModelResponse.hasValidationErrors)
+
+            XCTAssertEqual(apiModelResponse.object!.id, "1")
+            XCTAssertEqual(apiModelResponse.object!.title, "My Test")
+            XCTAssertEqual(apiModelResponse.object!.contents, "My Contents")
+            
+            readyExpectation.fulfill()
+            
+            OHHTTPStubs.removeAllStubs()
+        }
+        
+        self.waitForExpectationsWithTimeout(self.timeout) { err in
+            // By the time we reach this code, the while loop has exited
+            // so the response has arrived or the test has timed out
+            XCTAssertNil(err, "Received data should be nil")
+        }
+        
+    }
 }

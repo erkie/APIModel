@@ -47,6 +47,8 @@
 		207552BC1C484AD4009D519A /* Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207552BB1C484AD4009D519A /* Post.swift */; };
 		20A279241C4EA51200120C5F /* post_with_error.json in Resources */ = {isa = PBXBuildFile; fileRef = 20A279231C4EA51200120C5F /* post_with_error.json */; };
 		20B195E11C4FE7AD0017E7D2 /* 500_error.json in Resources */ = {isa = PBXBuildFile; fileRef = 20B195E01C4FE7AD0017E7D2 /* 500_error.json */; };
+		20B286071C56D3DC005213E7 /* post_with_attributes_and_error.json in Resources */ = {isa = PBXBuildFile; fileRef = 20B286061C56D3DC005213E7 /* post_with_attributes_and_error.json */; };
+		20B286091C56D730005213E7 /* Author.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B286081C56D730005213E7 /* Author.swift */; };
 		6377EB3DDC97316FEB89B483 /* Pods_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 111CBA07581C3F21B9A60B05 /* Pods_Tests.framework */; };
 		6D47F25F1AF786C8007DEF9A /* DoubleTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D47F25E1AF786C8007DEF9A /* DoubleTransform.swift */; };
 		6DE1A3261AFB6035002CB25E /* Object+ApiModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE1A3251AFB6035002CB25E /* Object+ApiModel.swift */; };
@@ -107,6 +109,8 @@
 		207552BB1C484AD4009D519A /* Post.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Post.swift; sourceTree = "<group>"; };
 		20A279231C4EA51200120C5F /* post_with_error.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = post_with_error.json; sourceTree = "<group>"; };
 		20B195E01C4FE7AD0017E7D2 /* 500_error.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 500_error.json; sourceTree = "<group>"; };
+		20B286061C56D3DC005213E7 /* post_with_attributes_and_error.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = post_with_attributes_and_error.json; sourceTree = "<group>"; };
+		20B286081C56D730005213E7 /* Author.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Author.swift; sourceTree = "<group>"; };
 		2D5BA2758CD4A8B5313DB805 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		401654F7FCB7720D7CB61B36 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		6D47F25E1AF786C8007DEF9A /* DoubleTransform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DoubleTransform.swift; sourceTree = "<group>"; };
@@ -213,6 +217,7 @@
 				2052AD521C485C6800C54C6A /* posts.json */,
 				20A279231C4EA51200120C5F /* post_with_error.json */,
 				20B195E01C4FE7AD0017E7D2 /* 500_error.json */,
+				20B286061C56D3DC005213E7 /* post_with_attributes_and_error.json */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -291,6 +296,7 @@
 			isa = PBXGroup;
 			children = (
 				207552BB1C484AD4009D519A /* Post.swift */,
+				20B286081C56D730005213E7 /* Author.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -411,6 +417,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				20A279241C4EA51200120C5F /* post_with_error.json in Resources */,
+				20B286071C56D3DC005213E7 /* post_with_attributes_and_error.json in Resources */,
 				20B195E11C4FE7AD0017E7D2 /* 500_error.json in Resources */,
 				2052AD531C485C6800C54C6A /* posts.json in Resources */,
 			);
@@ -511,6 +518,7 @@
 			files = (
 				033E791C1B7C9F78008E2A4D /* RootNamespaceTests.swift in Sources */,
 				033E79231B7C9FBB008E2A4D /* Utils.swift in Sources */,
+				20B286091C56D730005213E7 /* Author.swift in Sources */,
 				03088EE91C36B54200F02288 /* ApiManagerRequestTests.swift in Sources */,
 				207552BC1C484AD4009D519A /* Post.swift in Sources */,
 				2052AD511C485AB900C54C6A /* ApiFormTests.swift in Sources */,
