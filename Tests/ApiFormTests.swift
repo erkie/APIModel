@@ -288,7 +288,7 @@ class ApiFormTests: XCTestCase {
         author.id = "1"
         author.name = "Babaji"
         
-        let post = Post()
+        let post = PostWithInsertOrUpdate()
         post.id = "1"
         post.title = "My Title"
         post.contents = "My Contents"
@@ -306,7 +306,7 @@ class ApiFormTests: XCTestCase {
             return fixture(stubPath!, status: 422, headers: ["Content-Type":"application/json"])
         }
         
-        let form = Api<Post>(model: post)
+        let form = Api<PostWithInsertOrUpdate>(model: post)
         
         form.save { apiModelResponse in
             XCTAssertTrue(apiModelResponse.hasErrors)
@@ -316,6 +316,16 @@ class ApiFormTests: XCTestCase {
             XCTAssertEqual(apiModelResponse.object!.id, "1")
             XCTAssertEqual(apiModelResponse.object!.title, "My Test")
             XCTAssertEqual(apiModelResponse.object!.contents, "My Contents")
+            XCTAssertEqual(apiModelResponse.object!.author!.id, "1")
+            XCTAssertEqual(apiModelResponse.object!.author!.name, "New Name")
+            
+            let checkPost = self.testRealm.objectForPrimaryKey(PostWithInsertOrUpdate.self, key: "1")
+            
+            XCTAssertEqual(checkPost!.id, "1")
+            XCTAssertEqual(checkPost!.title, "My Test")
+            XCTAssertEqual(checkPost!.contents, "My Contents")
+            XCTAssertEqual(checkPost!.author!.id, "1")
+            XCTAssertEqual(checkPost!.author!.name, "New Name")
             
             readyExpectation.fulfill()
             

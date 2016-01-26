@@ -119,8 +119,13 @@ public class Api<ModelType:Object where ModelType:ApiModel> {
     
     public func updateFromResponse(response: ApiModelResponse<ModelType>) {
         if let responseObject = response.responseObject {
+            
             model.modifyStoredObject {
-                self.model.updateFromDictionary(responseObject)
+                if let shouldInsertOrUpdate = self.model.insertOrUpdate where shouldInsertOrUpdate{
+                    self.model.createOrUpdateFromDictionary(responseObject)
+                }else{
+                    self.model.updateFromDictionary(responseObject)
+                }
             }
             
             self.apiModelResponse = response
