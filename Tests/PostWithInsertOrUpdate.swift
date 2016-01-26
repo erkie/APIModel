@@ -1,8 +1,8 @@
 //
-//  Post.swift
+//  PostWithInsertOrUpdate.swift
 //  ApiModel
 //
-//  Created by Craig Heneveld on 1/14/16.
+//  Created by Craig Heneveld on 1/26/16.
 //
 //
 
@@ -10,7 +10,8 @@ import Foundation
 import RealmSwift
 import ApiModel
 
-class Post: Object, ApiModel {
+class PostWithInsertOrUpdate: Object, ApiModel {
+    
     // Standard Realm boilerplate
     dynamic var id = ""
     dynamic var title = ""
@@ -19,6 +20,10 @@ class Post: Object, ApiModel {
     
     // belongs to
     dynamic var author: Author?
+    
+    var insertOrUpdate: Bool? {
+        return true
+    }
     
     override class func primaryKey() -> String {
         return "id"

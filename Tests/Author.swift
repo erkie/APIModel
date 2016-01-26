@@ -1,25 +1,22 @@
 //
-//  Post.swift
+//  Author.swift
 //  ApiModel
 //
-//  Created by Craig Heneveld on 1/14/16.
+//  Created by Craig Heneveld on 1/25/16.
 //
 //
-
 import Foundation
 import RealmSwift
 import ApiModel
 
-class Post: Object, ApiModel {
+class Author: Object, ApiModel {
     // Standard Realm boilerplate
     dynamic var id = ""
-    dynamic var title = ""
-    dynamic var contents = ""
-    dynamic var createdAt = NSDate()
+    dynamic var name = ""
     
-    // belongs to
-    dynamic var author: Author?
-    
+    // has many
+    var posts = List<Post>()
+
     override class func primaryKey() -> String {
         return "id"
     }
@@ -27,14 +24,14 @@ class Post: Object, ApiModel {
     // Define the standard namespace this class usually resides in JSON responses
     // MUST BE singular ie `post` not `posts`
     class func apiNamespace() -> String {
-        return "post"
+        return "author"
     }
     
     // Define where and how to get these. Routes are assumed to use Rails style REST (index, show, update, destroy)
     class func apiRoutes() -> ApiRoutes {
         return ApiRoutes(
-            index: "/posts.json",
-            show: "/post/:id:.json"
+            index: "/authors.json",
+            show: "/authors/:id:.json"
         )
     }
     
@@ -43,10 +40,7 @@ class Post: Object, ApiModel {
     class func fromJSONMapping() -> JSONMapping {
         return [
             "id": ApiIdTransform(),
-            "title": StringTransform(),
-            "contents": StringTransform(),
-            "createdAt": NSDateTransform(),
-            "author": ModelTransform<Author>(),
+            "name": StringTransform()
         ]
     }
     
@@ -54,9 +48,7 @@ class Post: Object, ApiModel {
     func JSONDictionary() -> [String:AnyObject] {
         return [
             "id": id,
-            "title": title,
-            "contents": contents,
-            "created_at": createdAt
+            "name": name,
         ]
     }
 }

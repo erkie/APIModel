@@ -41,6 +41,28 @@ func updateRealmObjectFromDictionaryWithMapping(realmObject: Object, data: [Stri
     }
 }
 
+func dictionaryFromDictionaryWithMapping(realmObject: Object, data: [String:AnyObject], mapping: JSONMapping) -> [String:AnyObject] {
+    
+    var transformedData: [String:AnyObject] = [:]
+    
+    for (var key, value) in data {
+        key = camelizedString(key)
+        
+        if let transform = mapping[key] {
+            var optionalValue: AnyObject? = value as AnyObject?
+            
+            if value.isKindOfClass(NSNull) {
+                optionalValue = nil
+            }
+            
+            transformedData[key] = transform.perform(optionalValue)
+        }
+    }
+    
+    return transformedData
+    
+}
+
 extension Object {
     public func updateFromForm(data: NSDictionary) {
         let mapping = (self as! ApiModel).dynamicType.fromJSONMapping()
@@ -60,5 +82,14 @@ extension Object {
     
     public func updateFromDictionaryWithMapping(data: [String:AnyObject], mapping: JSONMapping) {
         updateRealmObjectFromDictionaryWithMapping(self, data: data, mapping: mapping)
+    }
+    
+    public func createOrUpdateFromDictionary(data: [String:AnyObject]) {
+        let mapping = (self as! ApiModel).dynamicType.fromJSONMapping()
+        let transformedDictionary = dictionaryFromDictionaryWithMapping(self, data: data, mapping: mapping)
+
+        if let realm = realm {
+            realm.create(self.dynamicType, value: transformedDictionary, update: true)
+        }
     }
 }

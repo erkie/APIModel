@@ -1,0 +1,12 @@
+{
+    "post": {
+        "id": "1",
+        "title": "My Test",
+        "contents": "My Contents",
+        "author" : {
+            "id": "1",
+            "name": "New Name"
+        },
+        "errors": [{"title": "is already taken!"}, {"contents": "is already taken!"}]
+    }
+}
