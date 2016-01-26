@@ -62,11 +62,6 @@ public extension ApiModelResponseable {
         return false
     }
     
-    var hasErrors: Bool {
-        return hasValidationErrors || hasInternalServerError
-    }
-    
-    
     var validationErrorMessages: [String]? {
         return errorArraytoStrings(validationErrors)
     }
@@ -83,6 +78,18 @@ public class ApiModelResponse<ModelType:Object where ModelType:ApiModel> : ApiMo
     public var responseArray: [AnyObject]?
     public var object: ModelType?
     public var array: [ModelType]?
+    
+    public var error: NSError? {
+        guard let rawResponse = rawResponse, error = rawResponse.error else{
+            return nil
+        }
+        
+        return error
+    }
+    
+    public var hasError: Bool {
+        return error != nil
+    }
 }
 
 public class Api<ModelType:Object where ModelType:ApiModel> {

@@ -124,7 +124,7 @@ class ApiFormTests: XCTestCase {
             XCTAssertNotNil(apiModelResponse)
             
             if let apiModelResponse = apiModelResponse {
-                XCTAssertTrue(apiModelResponse.hasErrors)
+                XCTAssertFalse(apiModelResponse.hasError)
                 XCTAssertTrue(apiModelResponse.hasInternalServerError)
                 XCTAssertFalse(apiModelResponse.hasValidationErrors)
                 
@@ -186,7 +186,7 @@ class ApiFormTests: XCTestCase {
         let form = Api<Post>(model: post)
         
         form.save { apiModelResponse in
-            XCTAssertTrue(apiModelResponse.hasErrors)
+            XCTAssertFalse(apiModelResponse.hasError)
             XCTAssertFalse(apiModelResponse.hasInternalServerError)
             XCTAssertTrue(apiModelResponse.hasValidationErrors)
             
@@ -224,7 +224,7 @@ class ApiFormTests: XCTestCase {
         let form = Api<Post>(model: post)
         
         form.save { apiModelResponse in
-            XCTAssertTrue(apiModelResponse.hasErrors)
+            XCTAssertFalse(apiModelResponse.hasError)
             XCTAssertTrue(apiModelResponse.hasInternalServerError)
             XCTAssertFalse(apiModelResponse.hasValidationErrors)
             
@@ -260,7 +260,7 @@ class ApiFormTests: XCTestCase {
         let form = Api<Post>(model: post)
         
         form.save { apiModelResponse in
-            XCTAssertTrue(apiModelResponse.hasErrors)
+            XCTAssertFalse(apiModelResponse.hasError)
             XCTAssertTrue(apiModelResponse.hasInternalServerError)
             XCTAssertFalse(apiModelResponse.hasValidationErrors)
             
@@ -309,7 +309,7 @@ class ApiFormTests: XCTestCase {
         let form = Api<PostWithInsertOrUpdate>(model: post)
         
         form.save { apiModelResponse in
-            XCTAssertTrue(apiModelResponse.hasErrors)
+            XCTAssertFalse(apiModelResponse.hasError)
             XCTAssertFalse(apiModelResponse.hasInternalServerError)
             XCTAssertTrue(apiModelResponse.hasValidationErrors)
 
@@ -338,5 +338,37 @@ class ApiFormTests: XCTestCase {
             XCTAssertNil(err, "Received data should be nil")
         }
         
+    }
+    
+    func testDownNetwork() {
+        let readyExpectation = self.expectationWithDescription("ready")
+        
+        stub({_ in true}) { request in
+            let notConnectedError = NSError(domain:NSURLErrorDomain, code:Int(CFNetworkErrors.CFURLErrorNotConnectedToInternet.rawValue), userInfo:nil)
+            return OHHTTPStubsResponse(error:notConnectedError)
+        }
+        
+        Api<Post>.findArray { response, apiModelResponse in
+            
+            XCTAssertNil(response, "response should be nil")
+            XCTAssertNotNil(apiModelResponse, "apiModelResponse not be nil")
+            
+            if let apiModelResponse = apiModelResponse {
+                XCTAssertTrue(apiModelResponse.hasError)
+                XCTAssertNotNil(apiModelResponse.error)
+                XCTAssertFalse(apiModelResponse.hasInternalServerError)
+                XCTAssertFalse(apiModelResponse.hasValidationErrors)
+            }
+
+            readyExpectation.fulfill()
+            OHHTTPStubs.removeAllStubs()
+        }
+        
+        
+        self.waitForExpectationsWithTimeout(self.timeout) { err in
+            // By the time we reach this code, the while loop has exited
+            // so the response has arrived or the test has timed out
+            XCTAssertNil(err, "Timeout hit")
+        }
     }
 }

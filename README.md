@@ -156,7 +156,9 @@ Api<Post>.get("/v1/posts.json") { response in
     print("isSuccessful: \(response.isSuccessful)")
     print("hasInternalServerError: \(response.hasInternalServerError)")
     print("hasValidationErrors: \(response.hasValidationErrors)")
-    print("hasErrors: \(response.hasErrors)")
+
+    print("hasError: \(response.hasError)")
+    print("error (NSError): \(response.error)")
 
     print("serverErrors: \(response.serverErrors)")
     print("serverErrorMessages (formatted serverErrors): \(response.serverErrorMessages)")
@@ -581,7 +583,7 @@ func upload() {
     userAvatar.imageData = UIImageJPEGRepresentation(image, 1)!
 
     Api(model: userAvatar).save { response in
-        if response.hasErrors {
+        if response.hasInternalServerError || response.hasValidationErrors || response.hasError {
             print("Could not upload file")
         } else {
             print("File uploaded! URL: \(userAvatar.url)")
