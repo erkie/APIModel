@@ -19,50 +19,50 @@ import RealmSwift
 import ApiModel
 
 class Post: Object, ApiModel {
-// Standard Realm boilerplate
-dynamic var id = ""
-dynamic var title = ""
-dynamic var contents = ""
-dynamic lazy var createdAt = NSDate()
+    // Standard Realm boilerplate
+    dynamic var id = ""
+    dynamic var title = ""
+    dynamic var contents = ""
+    dynamic lazy var createdAt = NSDate()
 
-override class func primaryKey() -> String {
-return "id"
-}
+    override class func primaryKey() -> String {
+        return "id"
+    }
 
-// Define the standard namespace this class usually resides in JSON responses
-// MUST BE singular ie `post` not `posts`
-class func apiNamespace() -> String {
-return "post"
-}
+    // Define the standard namespace this class usually resides in JSON responses
+    // MUST BE singular ie `post` not `posts`
+    class func apiNamespace() -> String {
+        return "post"
+    }
 
-// Define where and how to get these. Routes are assumed to use Rails style REST (index, show, update, destroy)
-class func apiRoutes() -> ApiRoutes {
-return ApiRoutes(
-index: "/posts.json",
-show: "/post/:id:.json"
-)
-}
+    // Define where and how to get these. Routes are assumed to use Rails style REST (index, show, update, destroy)
+    class func apiRoutes() -> ApiRoutes {
+        return ApiRoutes(
+            index: "/posts.json",
+            show: "/post/:id:.json"
+        )
+    }
 
-// Define how it is converted from JSON responses into Realm objects. A host of transforms are available
-// See section "Transforms" in README. They are super easy to create as well!
-class func fromJSONMapping() -> JSONMapping {
-return [
-"id": ApiIdTransform(),
-"title": StringTransform(),
-"contents": StringTransform(),
-"createdAt": NSDateTransform()
-]
-}
+    // Define how it is converted from JSON responses into Realm objects. A host of transforms are available
+    // See section "Transforms" in README. They are super easy to create as well!
+    class func fromJSONMapping() -> JSONMapping {
+        return [
+            "id": ApiIdTransform(),
+            "title": StringTransform(),
+            "contents": StringTransform(),
+            "createdAt": NSDateTransform()
+        ]
+    }
 
-// Define how this object is to be serialized back into a server response format
-func JSONDictionary() -> [String:AnyObject] {
-return [
-"id": id,
-"title": email,
-"contents": contents,
-"created_at": createdAt
-]
-}
+    // Define how this object is to be serialized back into a server response format
+    func JSONDictionary() -> [String:AnyObject] {
+        return [
+            "id": id,
+            "title": email,
+            "contents": contents,
+            "created_at": createdAt
+        ]
+    }
 }
 ```
 
@@ -115,7 +115,7 @@ To have a model-local configuration a model needs to implement the `ApiConfigura
 
 ```swift
 public protocol ApiConfigurable {
-static func apiConfig(config: ApiConfig) -> ApiConfig
+    static func apiConfig(config: ApiConfig) -> ApiConfig
 }
 ```
 
@@ -123,8 +123,8 @@ Input is the root base configuration and output is the model's own config object
 
 ```swift
 static func apiConfig(config: ApiConfig) -> ApiConfig {
-config.encoding = ApiRequest.FormDataEncoding
-return config
+    config.encoding = ApiRequest.FormDataEncoding
+    return config
 }
 ```
 
@@ -153,10 +153,19 @@ The base of `ApiModel` is the `Api` wrapper class. This class wraps an `Object` 
 ```swift
 // GET call without parameters
 Api<Post>.get("/v1/posts.json") { response in
-println("response.isSuccessful: \(response.isSuccessful)")
-println("Response as an array: \(response.array)")
-println("Response as a dictionary: \(response.dictionary)")
-println("Response errors?: \(response.errors)")
+    print("isSuccessful: \(response.isSuccessful)")
+    print("hasInternalServerError: \(response.hasInternalServerError)")
+    print("hasValidationErrors: \(response.hasValidationErrors)")
+    print("hasErrors: \(response.hasErrors)")
+
+    print("serverErrors: \(response.serverErrors)")
+    print("serverErrorMessages (formatted serverErrors): \(response.serverErrorMessages)")
+
+    print("validationErrors: \(response.validationErrors)")    
+    print("validationErrorMessages (formatted validationErrors) : \(response.validationErrorMessages)")
+
+    print("Response as an array: \(response.array)")
+    print("Response errors?: \(response.errors)")
 }
 
 // Other supported methods:
@@ -189,17 +198,17 @@ Using the `index` of a REST resource:
 `GET /posts.json`
 ```swift
 Api<Post>.findArray { posts, apiModelResponse in
-if apiModelResponse.hasInternalServerError {
-if let errorMessages = apiModelResponse.serverErrorMessages {
-for message in errorMessages {
-print("server error: \(message)")
-}
-}
-}else {
-for post in posts {
-print("... \(post.title)")
-}
-}
+    if apiModelResponse.hasInternalServerError {
+        if let errorMessages = apiModelResponse.serverErrorMessages {
+            for message in errorMessages {
+                print("server error: \(message)")
+            }
+        }
+    }else {
+        for post in posts {
+           print("... \(post.title)")
+        }
+    }
 }
 ```
 
@@ -208,17 +217,17 @@ Using the `show` of a REST resource:
 `GET /user.json`
 ```swift
 Api<User>.find { userResponse, apiModelResponse in
-if apiModelResponse.hasInternalServerError {
-if let errorMessages = apiModelResponse.serverErrorMessages {
-for message in errorMessages {
-print("server error: \(message)")
-}
-}
-} else if let user = userResponse {
-print("User is: \(user.email)")
-else {
-print("Error loading user")
-}
+    if apiModelResponse.hasInternalServerError {
+        if let errorMessages = apiModelResponse.serverErrorMessages {
+            for message in errorMessages {
+                print("server error: \(message)")
+            }
+        }
+    } else if let user = userResponse {
+        print("User is: \(user.email)")
+    else {
+        print("Error loading user")
+    }
 }
 ```
 
@@ -232,21 +241,21 @@ post.createdAt = NSDate()
 
 var form = Api<Post>(model: post)
 form.save { apiModelResponse in
-if apiModelResponse.hasInternalServerError {
-if let errorMessages = apiModelResponse.serverErrorMessages {
-for message in errorMessages {
-print("server error: \(message)")
-}
-}
-}else if apiModelResponse.hasValidationErrors{
-if let errorMessages = apiModelResponse.validationErrorMessages {
-for message in errorMessages {
-print("validation error: \(message)")
-}
-}
-} else{
-print("Saved! Post #\(post.id)")
-}
+    if apiModelResponse.hasInternalServerError {
+        if let errorMessages = apiModelResponse.serverErrorMessages {
+            for message in errorMessages {
+                print("server error: \(message)")
+            }
+        }
+    }else if apiModelResponse.hasValidationErrors{
+        if let errorMessages = apiModelResponse.validationErrorMessages {
+            for message in errorMessages {
+                print("validation error: \(message)")
+            }
+        }
+    } else{
+        print("Saved! Post #\(post.id)")
+    }
 }
 ```
 
@@ -255,11 +264,11 @@ print("Saved! Post #\(post.id)")
 `POST /posts.json`
 ```json
 {
-"post": {
-"title": "Hello world - A prologue",
-"contents": "Hello!",
-"created_at": "2015-03-08T14:19:31-01:00"
-}
+    "post": {
+        "title": "Hello world - A prologue",
+        "contents": "Hello!",
+        "created_at": "2015-03-08T14:19:31-01:00"
+    }
 }
 ```
 
@@ -268,9 +277,9 @@ If the response is successful, the attributes returned by the server will be upd
 `200 OK`
 ```json
 {
-"post": {
-"id": 1
-}
+    "post": {
+        "id": 1
+    }
 }
 ```
 
@@ -279,13 +288,13 @@ The errors are expected to be in the format:
 `422 Unprocessable Entity`
 ```json
 {
-"post": {
-"errors": {
-"contents": [
-"must be longer than 140 characters"
-]
-}
-}
+    "post": {
+        "errors": {
+            "contents": [
+                "must be longer than 140 characters"
+            ]
+        }
+    }
 }
 ```
 
@@ -296,6 +305,7 @@ apiModelResponse.validationErrors["contents"] // -> [String]
 // or
 apiModelResponse.validationErrorMessages // -> [String]
 ```
+
 `500 Errors` Will populate the apiModelResponse.serverError property, which is of type AnyObject, so you can handle as you'd like or if the 500 json response is formatted as an array of dictionaries the apiModelResponse.serverErrorMessages will be populated just like validationErrorMessages.
 
 ## Transforms
@@ -306,13 +316,13 @@ Transforms are used to convert attributes from JSON responses to rich types. The
 
 ```swift
 class IntTransform: Transform {
-func perform(value: AnyObject?) -> AnyObject {
-if let asInt = value?.integerValue {
-return asInt
-} else {
-return 0
-}
-}
+    func perform(value: AnyObject?) -> AnyObject {
+        if let asInt = value?.integerValue {
+            return asInt
+        } else {
+            return 0
+        }
+    }
 }
 ```
 
@@ -322,22 +332,22 @@ Transforms can be quite complex, and even convert nested models. For example:
 
 ```swift
 class User: Object, ApiModel {
-dynamic var id = ApiId()
-dynamic var email = ""
-let posts = List<Post>()
+    dynamic var id = ApiId()
+    dynamic var email = ""
+    let posts = List<Post>()
 
-static func fromJSONMapping() -> JSONMapping {
-return [
-"posts": ArrayTransform<Post>()
-]
-}
+    static func fromJSONMapping() -> JSONMapping {
+        return [
+            "posts": ArrayTransform<Post>()
+        ]
+    }
 }
 
 Api<User>.find { user, apiModelResponse in
-println("User: \(user.email)")
-for post in user.posts {
-println("\(post.title)")
-}
+    println("User: \(user.email)")
+    for post in user.posts {
+        println("\(post.title)")
+    }
 }
 ```
 
@@ -363,11 +373,11 @@ Dates come in plenty of different formats. The default format `ApiModel` and `NS
 
 ```swift
 class Post: Object, APIModel {
-class func fromJSONMapping() -> JSONMapping {
-return [
-"createdAt": NSDateTransform()
-]
-}
+    class func fromJSONMapping() -> JSONMapping {
+        return [
+            "createdAt": NSDateTransform()
+        ]
+    }
 }
 
 // Example of a valid string:
@@ -378,11 +388,11 @@ In the real world you will come across many wildly different date formats and ma
 
 ```swift
 class Post: Object, APIModel {
-class func fromJSONMapping() -> JSONMapping {
-return [
-"createdAt": NSDateTransform(dateFormat: "yyyy-MM-dd")
-]
-}
+    class func fromJSONMapping() -> JSONMapping {
+        return [
+            "createdAt": NSDateTransform(dateFormat: "yyyy-MM-dd")
+        ]
+    }
 }
 
 // Example of a valid string:
@@ -431,9 +441,9 @@ Rule of thumb: You should only think about time zones when displaying `NSDate`s.
 ```swift
 // Put this somewhere in your AppDelegate or together with other initialization code
 api().beforeRequest { request in
-if let loginToken = User.loginToken() {
-request.parameters["access_token"] = loginToken
-}
+    if let loginToken = User.loginToken() {
+        request.parameters["access_token"] = loginToken
+    }
 }
 ```
 
@@ -441,9 +451,9 @@ There is also a `afterRequest` which passes in a `ApiRequest` and `ApiResponse`:
 
 ```swift
 api().afterRequest { request, response in
-println("... Got: \(response.status)")
-println("... \(request)")
-println("... \(response)")
+    print("... Got: \(response.status)")
+    print("... \(request)")
+    print("... \(response)")
 }
 ```
 
@@ -466,9 +476,9 @@ Some API's wrap all their responses in an "envelope", a container that is generi
 
 ```json
 {
-"data": {
-"user": { ... }
-}
+    "data": {
+        "user": { ... }
+    }
 }
 ```
 
@@ -483,15 +493,15 @@ It can also be more complex, for example if the envelope looked something like t
 
 ```json
 {
-"JsonResponseEnvelope": {
-"SuccessFullJsonResponse": {
-"SoapResponseContainer": {
-"EnterpriseBeanData": {
-"user": { ... }
-}
-}
-}
-}
+    "JsonResponseEnvelope": {
+        "SuccessFullJsonResponse": {
+            "SoapResponseContainer": {
+                "EnterpriseBeanData": {
+                    "user": { ... }
+                }
+            }
+        }
+    }
 }
 ```
 
@@ -520,63 +530,63 @@ import ApiModel
 import UIKit
 
 class UserAvatar: Object, ApiModel, ApiConfigurable {
-dynamic var userId = ApiId()
-dynamic var url = String() // generated on the server
+    dynamic var userId = ApiId()
+    dynamic var url = String() // generated on the server
 
-var imageData: NSData?
+    var imageData: NSData?
 
-class func apiConfig(config: ApiConfig) -> ApiConfig {
-// ApiRequest.FormDataEncoding is where the magic happens
-// It tells ApiModel to encode everything with `multipart/form-data`
-config.encoding = ApiRequest.FormDataEncoding
-return config
-}
+    class func apiConfig(config: ApiConfig) -> ApiConfig {
+        // ApiRequest.FormDataEncoding is where the magic happens
+        // It tells ApiModel to encode everything with `multipart/form-data`
+        config.encoding = ApiRequest.FormDataEncoding
+        return config
+    }
 
-// Important because the `imageData` property cannot be represented by Realm
-override class func ignoredProperties() -> [String] {
-return ["imageData"]
-}
+    // Important because the `imageData` property cannot be represented by Realm
+    override class func ignoredProperties() -> [String] {
+        return ["imageData"]
+    }
 
-override class func primaryKey() -> String {
-return "userId"
-}
+    override class func primaryKey() -> String {
+        return "userId"
+    }
 
-class func apiNamespace() -> String {
-return "user_avatar"
-}
+    class func apiNamespace() -> String {
+        return "user_avatar"
+    }
 
-class func apiRoutes() -> ApiRoutes {
-return ApiRoutes.resource("/user/avatar.json")
-}
+    class func apiRoutes() -> ApiRoutes {
+        return ApiRoutes.resource("/user/avatar.json")
+    }
 
-class func fromJSONMapping() -> JSONMapping {
-return [
-"userId": ApiIdTransform(),
-"url": StringTransform()
-]
-}
+    class func fromJSONMapping() -> JSONMapping {
+        return [
+            "userId": ApiIdTransform(),
+            "url": StringTransform()
+        ]
+    }
 
-func JSONDictionary() -> [String:AnyObject] {
-return [
-"image": FileUpload(fileName: "avatar.jpg", mimeType: "image/jpg", data: imageData!)
-]
-}
+    func JSONDictionary() -> [String:AnyObject] {
+        return [
+            "image": FileUpload(fileName: "avatar.jpg", mimeType: "image/jpg", data: imageData!)
+        ]
+    }
 }
 
 func upload() {
-let image = UIImage(named: "me.jpg")!
+    let image = UIImage(named: "me.jpg")!
 
-let userAvatar = UserAvatar()
-userAvatar.userId = "1"
-userAvatar.imageData = UIImageJPEGRepresentation(image, 1)!
+    let userAvatar = UserAvatar()
+    userAvatar.userId = "1"
+    userAvatar.imageData = UIImageJPEGRepresentation(image, 1)!
 
-Api(model: userAvatar).save { form in
-if form.hasErrors {
-print("Could not upload file: " + form.errorMessages.joinWithSeparator("\n"))
-} else {
-print("File uploaded! URL: \(userAvatar.url)")
-}
-}
+    Api(model: userAvatar).save { response in
+        if response.hasErrors {
+            print("Could not upload file")
+        } else {
+            print("File uploaded! URL: \(userAvatar.url)")
+        }
+    }
 }
 ```
 
