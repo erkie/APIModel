@@ -107,6 +107,21 @@ If you would like to disable request logging, you can do so by setting `requestL
 apiConfig.requestLogging = false
 ```
 
+If you would like ApiModel to use a NSURLSessionConfiguration, you can set it like in the following example:
+
+```swift
+    let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
+    configuration.timeoutIntervalForRequest = 15 // shorten default timeout
+    configuration.timeoutIntervalForResource = 15 // shorten default timeout
+        
+    ApiSingleton.setInstance(ApiManager(config: ApiConfig(host: "http://feed.myapi.com", urlSessionConfig:configuration)))
+
+    // or
+    //...
+    apiConfig.urlSessionConfig = configuration
+
+```
+
 ### Global and Model-local configurations
 
 For the most part an API is consistent across endpoints, however in the real world, conventions usually differ wildly. The global configuration is the one set by calling `ApiSingleton.setInstance(ApiManager(configuration: apiConfig))`.

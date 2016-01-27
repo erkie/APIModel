@@ -93,4 +93,35 @@ class ApiManagerResponseTests: XCTestCase {
             XCTAssertNotNil(theResponse, "Received data should not be nil")
         }
     }
+    
+    func testSessionConfig() {
+        
+        let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
+        configuration.timeoutIntervalForRequest = 1 // seconds
+        configuration.timeoutIntervalForResource = 1
+        
+        ApiSingleton.setInstance(ApiManager(config: ApiConfig(host: self.host, urlSessionConfig:configuration)))
+
+        let readyExpectation = self.expectationWithDescription("ready")
+        
+        stub({_ in true}) { request in
+            return OHHTTPStubsResponse(data:"Something went wrong!".dataUsingEncoding(NSUTF8StringEncoding)!, statusCode: 500, headers: nil)
+                .requestTime(2.0, responseTime: 2.0)
+        }
+        
+        Api<Post>.get("/v1/posts.json") { response in
+            
+            // -1001 indicates a timeout occured which is what's expected
+            XCTAssertEqual(response.error?.code, -1001)
+            
+            readyExpectation.fulfill()
+            OHHTTPStubs.removeAllStubs()
+        }
+        
+        self.waitForExpectationsWithTimeout(self.timeout) { err in
+            // By the time we reach this code, the while loop has exited
+            // so the response has arrived or the test has timed out
+            XCTAssertNil(err, "Timeout occured")
+        }
+    }
 }

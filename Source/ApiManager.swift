@@ -7,8 +7,16 @@ public class ApiManager {
     public var beforeRequestHooks: [((ApiRequest) -> Void)] = []
     public var afterRequestHooks: [((ApiRequest, ApiResponse) -> Void)] = []
     
+    private var alamoFireManager : Alamofire.Manager
+    
     public init(config: ApiConfig) {
         self.config = config
+        
+        if let sessionConfig = config.urlSessionConfig {
+            self.alamoFireManager = Alamofire.Manager(configuration: sessionConfig)
+        }else{
+            self.alamoFireManager = Alamofire.Manager()
+        }
         
         beforeRequest { request in
             if self.config.requestLogging {
@@ -100,7 +108,7 @@ public class ApiManager {
     func performRequest(request: ApiRequest, responseHandler: (ApiResponse) -> Void) {
         let response = ApiResponse(request: request)
         
-        Alamofire.request(
+        self.alamoFireManager.request(
             request.method,
             request.url,
             parameters: request.parameters,
