@@ -10,65 +10,7 @@ public protocol ApiModelResponseable {
     var validationErrors: [[String : String]]?  { get set }
 }
 
-public extension ApiModelResponseable {
-    
-    private func errorArraytoStrings(array: [[String: String]]?) -> [String]? {
-        if let array = array {
-            var messages = [String]()
-            
-            for fieldErrors in array {
-                
-                for (field, descrpt) in fieldErrors {
-                    messages.append("\(field.capitalizedString): \(descrpt)")
-                }
-            }
-            
-            return messages
-        }
-        
-        return nil
-    }
-    
-    var isSuccessful: Bool {
-        if let rawResponse = self.rawResponse {
-            return rawResponse.isSuccessful
-        }
-        
-        return false
-    }
-    
-    var serverErrorMessages: [String]? {
-        
-        if let serverErrors = serverErrors as? [[String: String]] {
-            return errorArraytoStrings(serverErrors)
-        }
-        
-        return nil
-    }
-    
-    var hasInternalServerError: Bool {
-        if let rawResponse = self.rawResponse where rawResponse.isInternalServerError {
-            return true
-        }
-        
-        return false
-    }
-    
-    var hasValidationErrors: Bool {
-        if let rawResponse = self.rawResponse where rawResponse.isUnprocessableEntity {
-            return true
-        }
-        
-        return false
-    }
-    
-    var validationErrorMessages: [String]? {
-        return errorArraytoStrings(validationErrors)
-    }
-}
-
-
-public class ApiModelResponse<ModelType:Object where ModelType:ApiModel> : ApiModelResponseable {
+public class ApiModelResponse<ModelType:Object where ModelType:ApiModel> {
     public var responseData: [String:AnyObject]?
     public var rawResponse: ApiResponse?
     public var serverErrors: AnyObject?
@@ -89,6 +31,60 @@ public class ApiModelResponse<ModelType:Object where ModelType:ApiModel> : ApiMo
     
     public var hasError: Bool {
         return error != nil
+    }
+    
+    private func errorArraytoStrings(array: [[String: String]]?) -> [String]? {
+        if let array = array {
+            var messages = [String]()
+            
+            for fieldErrors in array {
+                
+                for (field, descrpt) in fieldErrors {
+                    messages.append("\(field.capitalizedString): \(descrpt)")
+                }
+            }
+            
+            return messages
+        }
+        
+        return nil
+    }
+    
+    public var isSuccessful: Bool {
+        if let rawResponse = self.rawResponse {
+            return rawResponse.isSuccessful
+        }
+        
+        return false
+    }
+    
+    public var serverErrorMessages: [String]? {
+        
+        if let serverErrors = serverErrors as? [[String: String]] {
+            return errorArraytoStrings(serverErrors)
+        }
+        
+        return nil
+    }
+    
+    public var hasInternalServerError: Bool {
+        if let rawResponse = self.rawResponse where rawResponse.isInternalServerError {
+            return true
+        }
+        
+        return false
+    }
+    
+    public var hasValidationErrors: Bool {
+        if let rawResponse = self.rawResponse where rawResponse.isUnprocessableEntity {
+            return true
+        }
+        
+        return false
+    }
+    
+    public var validationErrorMessages: [String]? {
+        return errorArraytoStrings(validationErrors)
     }
 }
 
