@@ -1,15 +1,6 @@
 import RealmSwift
 import Alamofire
 
-public protocol ApiModelResponseable {
-    
-    var responseData: [String:AnyObject]? { get set }
-    var rawResponse: ApiResponse?  { get set }
-    
-    var serverErrors: AnyObject?  { get set }
-    var validationErrors: [[String : String]]?  { get set }
-}
-
 public class ApiModelResponse<ModelType:Object where ModelType:ApiModel> {
     public var responseData: [String:AnyObject]?
     public var rawResponse: ApiResponse?
