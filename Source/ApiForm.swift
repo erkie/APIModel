@@ -161,7 +161,7 @@ public class Api<ModelType:Object where ModelType:ApiModel> {
     // api-model style methods
     
     public class func performWithMethod(method: Alamofire.Method, path: String, parameters: RequestParameters, apiConfig: ApiConfig, callback: ResponseCallback?) {
-        let call = ApiCall(method: method, path: path, parameters: parameters, namespace: ModelType.apiNamespace())
+        let call = ApiCall(method: method, path: path, parameters: parameters, namespace: ModelType.apiAwareNamespace())
         perform(call, apiConfig: apiConfig, callback: callback)
     }
     
@@ -248,9 +248,10 @@ public class Api<ModelType:Object where ModelType:ApiModel> {
     }
     
     public func save(callback: (Api) -> Void) {
-        let parameters: [String: AnyObject] = [
-            ModelType.apiNamespace(): model.JSONDictionary()
-        ]
+        var parameters = model.JSONDictionary()
+        if let namespace = ModelType.apiAwareNamespace().requestNamespace {
+            parameters = [namespace : parameters]
+        }
         
         let responseCallback: ResponseCallback = { response in
             self.updateFromResponse(response)
@@ -307,11 +308,17 @@ public class Api<ModelType:Object where ModelType:ApiModel> {
         }
     }
     
-    private class func objectFromResponseForNamespace(data: AnyObject, namespace: String) -> [String:AnyObject]? {
+    private class func objectFromResponseForNamespace(data: AnyObject, namespace: ApiNamespace) -> [String:AnyObject]? {
+        guard let namespace = namespace.responseNamespace else {
+            return data as? [String : AnyObject]
+        }
         return (data[namespace] as? [String:AnyObject]) ?? (data[namespace.pluralize()] as? [String:AnyObject])
     }
     
-    private class func arrayFromResponseForNamespace(data: AnyObject, namespace: String) -> [AnyObject]? {
+    private class func arrayFromResponseForNamespace(data: AnyObject, namespace: ApiNamespace) -> [AnyObject]? {
+        guard let namespace = namespace.responseNamespace else {
+            return data as? [AnyObject]
+        }
         return (data[namespace] as? [AnyObject]) ?? (data[namespace.pluralize()] as? [AnyObject])
     }
     
