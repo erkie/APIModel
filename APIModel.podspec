@@ -20,5 +20,5 @@ Pod::Spec.new do |s|
   s.requires_arc = true
   s.dependency "Alamofire", "~> 3.0"
   s.dependency "SwiftyJSON", "~> 2.3.0"
-  s.dependency "RealmSwift", "~> 0.98.6"
+  s.dependency "RealmSwift", "~> 0.101.0"
 end
